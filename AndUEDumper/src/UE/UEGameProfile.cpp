@@ -7,7 +7,7 @@ using namespace UEMemory;
 
 UEVarsInitStatus IGameProfile::InitUEVars()
 {
-    bool is32Bit = KittyMemoryEx::getMapsEndWith(kMgr.processID(), "/linker64").empty();
+    bool is32Bit = KittyMemoryEx::getMaps(kMgr.processID(), EProcMapFilter::EndWith, "/linker64").empty();
     if (is32Bit)
     {
         if (sizeof(void *) != 4)
@@ -45,10 +45,14 @@ UEVarsInitStatus IGameProfile::InitUEVars()
         }
     }
 
+    LOGI("Library: %s", ue_elf.filePath().c_str());
+    LOGI("BaseAddress: %p", (void*)ue_elf.base());
+    LOGI("==========================");
+
     kPtrValidator.setPID(kMgr.processID());
     kPtrValidator.setUseCache(true);
     kPtrValidator.refreshRegionCache();
-    if (kPtrValidator.regions().empty())
+    if (kPtrValidator.cachedRegions().empty())
         return UEVarsInitStatus::ERROR_INIT_PTR_VALIDATOR;
 
     _UEVars.BaseAddress = ue_elf.base();
@@ -221,18 +225,30 @@ ElfScanner IGameProfile::GetUnrealELF() const
 
     for (const auto &lib : cUELibNames)
     {
-        ue_elf = kMgr.findMemElf(lib);
+        ue_elf = kMgr.elfScanner.findElf(lib, EScanElfType::Any, EScanElfFilter::App);
         if (ue_elf.isValid())
             return ue_elf;
     }
 
-    // last resort, linker solist
+    // find via linker or nativebridge solist
     // some games like farlight and pubg remove ELF header from lib
     for (const auto &lib : cUELibNames)
     {
-        ue_elf = kMgr.findMemElfInLinker(lib);
-        if (ue_elf.isValid())
-            return ue_elf;
+        auto nativeSo = kMgr.linkerScanner.findSoInfo(lib);
+        if (nativeSo.ptr)
+        {
+            ue_elf = kMgr.elfScanner.createWithSoInfo(nativeSo);
+            if (ue_elf.isValid())
+                return ue_elf;
+        }
+
+        auto emulatedSo = kMgr.nbScanner.findSoInfo(lib);
+        if (emulatedSo.ptr)
+        {
+            ue_elf = kMgr.elfScanner.createWithSoInfo(emulatedSo);
+            if (ue_elf.isValid())
+                return ue_elf;
+        }
     }
 
     return ue_elf;
@@ -240,15 +256,9 @@ ElfScanner IGameProfile::GetUnrealELF() const
 
 bool IGameProfile::isEmulator() const
 {
-    if (!KittyMemoryEx::getMapsContain(kMgr.processID(), "/arm/nb/").empty() ||
-        !KittyMemoryEx::getMapsContain(kMgr.processID(), "/arm64/nb/").empty())
-        return true;
-
-    for (auto &it : GetUnrealELF().segments())
-        if (it.executable)
-            return false;
-
-    return true;
+    const auto elf = GetUnrealELF();
+    return (elf.isValid() && !elf.isHeaderless() && kMgr.elfScanner.isElfEmulated(elf))
+    || kMgr.nbScanner.isValid();
 }
 
 uintptr_t IGameProfile::findIdaPattern(PATTERN_MAP_TYPE map_type,

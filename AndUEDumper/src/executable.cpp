@@ -160,7 +160,7 @@ int main(int argc, char **args)
         sGamePackage = UE_Games[gameIndexMap[gameNumber].first]->GetAppIDs()[gameIndexMap[gameNumber].second];
     }
 
-    auto gamePIDs = KittyMemoryEx::getPIDsOf(sGamePackage);
+    auto gamePIDs = KittyMemoryEx::getProcessIDs(sGamePackage);
     if (gamePIDs.empty())
     {
         LOGE("Couldn't find \"%s\" in the running processes list.", sGamePackage.c_str());
