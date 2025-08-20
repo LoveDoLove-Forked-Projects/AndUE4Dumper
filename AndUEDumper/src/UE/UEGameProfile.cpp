@@ -34,7 +34,7 @@ UEVarsInitStatus IGameProfile::InitUEVars()
 
     if (!ArchSupprted())
     {
-        if (GetUnrealELF().header().e_machine > 0 && !ue_elf.isHeaderless())
+        if (GetUnrealELF().header().e_machine > 0 && !ue_elf.isFixedBySoInfo())
         {
             LOGE("Architecture ( 0x%x ) is not supported for this game.", ue_elf.header().e_machine);
             return UEVarsInitStatus::ARCH_NOT_SUPPORTED;
@@ -46,7 +46,7 @@ UEVarsInitStatus IGameProfile::InitUEVars()
     }
 
     LOGI("Library: %s", ue_elf.filePath().c_str());
-    LOGI("BaseAddress: %p", (void*)ue_elf.base());
+    LOGI("BaseAddress: %p", (void *)ue_elf.base());
     LOGI("==========================");
 
     kPtrValidator.setPID(kMgr.processID());
@@ -257,8 +257,7 @@ ElfScanner IGameProfile::GetUnrealELF() const
 bool IGameProfile::isEmulator() const
 {
     const auto elf = GetUnrealELF();
-    return (elf.isValid() && !elf.isHeaderless() && kMgr.elfScanner.isElfEmulated(elf))
-    || kMgr.nbScanner.isValid();
+    return (elf.isValid() && kMgr.elfScanner.isElfEmulated(elf)) || kMgr.nbScanner.isValid();
 }
 
 uintptr_t IGameProfile::findIdaPattern(PATTERN_MAP_TYPE map_type,
