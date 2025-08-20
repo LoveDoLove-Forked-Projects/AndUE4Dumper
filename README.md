@@ -17,32 +17,34 @@ project.
 
 ## Currently Supported Games
 
-* Ark Ultimate
 * Arena Breakout
+* Ark Ultimate
 * Auroria
 * Black Clover M
+* Blade Soul Revolution
+* Case 2 Animatronics
+* Century Age of Ashes
 * Delta Force
 * Dislyte
 * Farlight 84
-* Injustice 2
-* Mortal Kombat
-* Odin Valhalla Rising
-* Real Boxing 2
-* Rooftops Parkour Pro
-* The Baby In Yellow
-* Torchlight: Infinite
-* Wuthering Waves
-* Blade Soul Revolution
-* Lineage 2 Revolution
-* Lineage W
-* eFootball (PES)
-* King Arthur Legends Rise
-* Night Crows
-* Century Age Of Ashes
-* Case 2 Animatronics
 * Hello Neighbor
 * Hello Neighbor Nicky's Diaries
+* Injustice 2
+* King Arthur Legends Rise
+* Lineage 2 Revolution
+* Lineage W
+* Mortal Kombat
+* Night Crows
+* Odin Valhalla Rising
+* RL Sideswipe
+* Real Boxing 2
+* Rooftops Parkour Pro
 * Special Forces Group 2
+* The Baby In Yellow
+* Torchlight: Infinite
+* Tower Of Fantasy
+* Wuthering Waves
+* eFootball (PES)
 
 ## Library Usage
 
