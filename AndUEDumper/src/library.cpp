@@ -43,6 +43,7 @@
 #include "UE/UEGameProfiles/Auroria.hpp"
 #include "UE/UEGameProfiles/LineageW.hpp"
 #include "UE/UEGameProfiles/RLSideswipe.hpp"
+#include "UE/UEGameProfiles/PUBG.hpp"
 
 std::vector<IGameProfile *> UE_Games = {
     new PESProfile(),
@@ -73,6 +74,7 @@ std::vector<IGameProfile *> UE_Games = {
     new AuroriaProfile(),
     new LineageWProfile(),
     new RLSideswipeProfile(),
+    new PUBGProfile(),
 };
 
 #define kUEDUMPER_VERSION "4.2.0"
