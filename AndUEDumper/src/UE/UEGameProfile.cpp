@@ -45,7 +45,7 @@ UEVarsInitStatus IGameProfile::InitUEVars()
         }
     }
 
-    LOGI("Library: %s", ue_elf.filePath().c_str());
+    LOGI("Library: %s", ue_elf.realPath().c_str());
     LOGI("BaseAddress: %p", (void *)ue_elf.base());
     LOGI("==========================");
 
