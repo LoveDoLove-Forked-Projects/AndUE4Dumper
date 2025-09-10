@@ -217,9 +217,12 @@ std::vector<std::string> IGameProfile::GetUESoNames() const
 
 ElfScanner IGameProfile::GetUnrealELF() const
 {
+    static std::mutex mtx;
+    std::lock_guard<std::mutex> lock(mtx);
+
     static const std::vector<std::string> cUELibNames = GetUESoNames();
 
-    thread_local static ElfScanner ue_elf{};
+    static ElfScanner ue_elf{};
     if (ue_elf.isValid())
         return ue_elf;
 
