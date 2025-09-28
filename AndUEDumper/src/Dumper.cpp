@@ -244,10 +244,10 @@ void UEDumper::DumpOffsetsInfo(BufferFmt &logsBufferFmt, BufferFmt &offsetsBuffe
 
         logsBufferFmt.append("Finding ProcessEvent...\n");
         uint8_t *obj = UEngineObj ? UEngineObj : UWorldObj;
-        if (obj && _profile->findProcessEvent(obj, &ProcessEventPtr, &ProcessEventIndex))
+        if (!obj || !_profile->findProcessEvent(obj, &ProcessEventPtr, &ProcessEventIndex))
             logsBufferFmt.append("Couldn't find ProcessEvent.\n");
         else
-            logsBufferFmt.append("ProcessEvent: Index(%d) | [<Base> + 0x{:X}] = 0x{:X}\n", ProcessEventIndex, ProcessEventPtr - baseAddr, ProcessEventPtr);
+            logsBufferFmt.append("ProcessEvent: Index({}) | [<Base> + 0x{:X}] = 0x{:X}\n", ProcessEventIndex, ProcessEventPtr - baseAddr, ProcessEventPtr);
     }
 
     UE_Pointers uEPointers{};
