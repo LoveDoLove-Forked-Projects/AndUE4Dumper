@@ -58,7 +58,7 @@ public:
             return 0;
         }
 
-        uintptr_t adrl = Arm64::Decode_ADRP_ADD(GNamesInit);
+        uintptr_t adrl = Arm64::DecodeADRL(GNamesInit);
         return adrl ? (adrl + GetPtrAlignedOf(sizeof(bool))) : 0;
     }
 

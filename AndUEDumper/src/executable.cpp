@@ -80,7 +80,7 @@ std::vector<IGameProfile *> UE_Games = {
     new PUBGProfile(),
 };
 
-#define kUEDUMPER_VERSION "4.2.0"
+#define kUEDUMPER_VERSION "4.3.0"
 
 bool bNeededHelp = false;
 
@@ -182,7 +182,7 @@ int main(int argc, char **args)
         std::cout << "Process number: ";
         int gamePidIndex = 0;
         scanf("%d", &gamePidIndex);
-        if (gamePidIndex < 0 || gamePidIndex >= gamePIDs.size())
+        if (gamePidIndex < 0 || gamePidIndex >= int(gamePIDs.size()))
         {
             LOGE("Selected PID index is out of range.");
             return 1;

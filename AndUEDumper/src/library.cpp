@@ -77,7 +77,7 @@ std::vector<IGameProfile *> UE_Games = {
     new PUBGProfile(),
 };
 
-#define kUEDUMPER_VERSION "4.2.0"
+#define kUEDUMPER_VERSION "4.3.0"
 
 // increase if needed
 #define WAIT_TIME_SEC 20
@@ -170,7 +170,7 @@ void dump_thread(bool bDumpLib)
         }
     });
 
-    uEDumper.setObjectsProgressCallback([](const SimpleProgressBar &progress)
+    uEDumper.setObjectsProgressCallback([](const SimpleProgressBar &)
     {
         static bool once = false;
         if (!once)
@@ -180,7 +180,7 @@ void dump_thread(bool bDumpLib)
         };
     });
 
-    uEDumper.setDumpProgressCallback([](const SimpleProgressBar &progress)
+    uEDumper.setDumpProgressCallback([](const SimpleProgressBar &)
     {
         static bool once = false;
         if (!once)

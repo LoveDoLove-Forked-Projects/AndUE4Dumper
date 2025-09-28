@@ -52,7 +52,7 @@ public:
 
         PATTERN_MAP_TYPE map_type = isEmulator() ? PATTERN_MAP_TYPE::ANY_R : PATTERN_MAP_TYPE::ANY_X;
 
-        return Arm64::Decode_ADRP_ADD(findIdaPattern(map_type, ida_pattern, step));
+        return Arm64::DecodeADRL(findIdaPattern(map_type, ida_pattern, step));
     }
 
     uintptr_t GetNamesPtr() const override
@@ -62,7 +62,7 @@ public:
 
         PATTERN_MAP_TYPE map_type = isEmulator() ? PATTERN_MAP_TYPE::ANY_R : PATTERN_MAP_TYPE::ANY_X;
 
-        uintptr_t param_1 = Arm64::Decode_ADRP_ADD(findIdaPattern(map_type, ida_pattern, step));
+        uintptr_t param_1 = Arm64::DecodeADRL(findIdaPattern(map_type, ida_pattern, step));
         if (param_1 == 0)
             return 0;
 

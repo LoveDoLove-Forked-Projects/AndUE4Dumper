@@ -58,7 +58,7 @@ public:
             std::string ida_pattern = it.first;
             const int step = it.second;
 
-            uintptr_t adrl = Arm64::Decode_ADRP_ADD(findIdaPattern(map_type, ida_pattern, step));
+            uintptr_t adrl = Arm64::DecodeADRL(findIdaPattern(map_type, ida_pattern, step));
             if (adrl != 0) return adrl;
         }
 
@@ -67,33 +67,36 @@ public:
 
     uintptr_t GetNamesPtr() const override
     {
-        std::vector<std::pair<std::string, int>> idaPatterns = {
-            // FNameEntry const* FName::GetEntry(FNameEntryId id);
-            {"F4 4F 01 A9 FD 7B 02 A9 FD 83 00 91 ? ? ? ? ? ? ? ? A8 02 ? 39", 0x18},
-            {"F4 4F 01 A9 FD 7B 02 A9 FD 83 00 91 ? ? ? ? A8 02 ? 39", 0x24},
-
-            // DebugDump
-            {"fd 7b 01 a9 fd 43 00 91 ? ? ? ? 89 ? ? 39 f3 03 08 aa c9 00 00 37 ? ? ? ? ? ? ? 91", 0x18},
-
-            {"f8 c8 ? ? 39 c8 00 00 37 ? ? ? ? ? ? ? 91", 9},
-
-            // GetPlainName ToString AppendString GetStringLength
-            {"02 ? 91 C8 00 00 37 ? ? ? ? ? ? ? 91", 7},
-
-            {"39 C8 00 00 37 ? ? ? ? ? ? ? 91 ? ? ? 97 ? 00 80 52 ? ? ? 39", 5},
-            {"C8 00 00 37 ? ? ? ? ? ? ? 91 ? ? ? 97 ? 00 80 52", 4},
-            {"C8 00 00 37 ? ? ? ? ? ? ? 91 ? ? ? 97", 4},
-        };
+        std::string pattern = "F4 4F 01 A9 FD 7B 02 A9 FD 83 00 91 ? ? ? ? A8 02 ? 39";
 
         PATTERN_MAP_TYPE map_type = isEmulator() ? PATTERN_MAP_TYPE::ANY_R : PATTERN_MAP_TYPE::ANY_X;
 
-        for (const auto &it : idaPatterns)
+        uintptr_t find = findIdaPattern(map_type, pattern, 0);
+        if (find != 0)
         {
-            std::string ida_pattern = it.first;
-            const int step = it.second;
+            bool skippedFirst = false;
+            intptr_t adrp_adr = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                uint32_t insn = vm_rpm_ptr<uint32_t>((void*)(find + (i * 4)));
+                if (KittyArm64::decodeInsnType(insn) != EKittyInsnTypeArm64::ADRP)
+                    continue;
 
-            uintptr_t adrl = Arm64::Decode_ADRP_ADD(findIdaPattern(map_type, ida_pattern, step));
-            if (adrl != 0) return adrl;
+                if (!skippedFirst)
+                {
+                    skippedFirst = true;
+                    continue;
+                }
+
+                adrp_adr = find + (i * 4);
+                break;
+            }
+
+            if (adrp_adr != 0)
+            {
+                // 0 so the it scans for next imm instruction offset
+                return Arm64::DecodeADRL(adrp_adr, 0);
+            }
         }
 
         return 0;
@@ -108,6 +111,20 @@ public:
         {
             once = true;
             offsets.FNamePool.BlocksOff += sizeof(void *);
+
+            // https://github.com/MJx0/AndUEDumper/issues/42
+            offsets.UStruct.SuperStruct += sizeof(void *);
+            offsets.UStruct.Children += sizeof(void *);
+            offsets.UStruct.ChildProperties += sizeof(void *);
+            offsets.UStruct.PropertiesSize += sizeof(void *);
+
+            offsets.UField.Next += sizeof(void *);
+            offsets.UEnum.Names += sizeof(void *);
+
+            offsets.UFunction.EFunctionFlags += sizeof(void *);
+            offsets.UFunction.NumParams += sizeof(void *);
+            offsets.UFunction.ParamSize += sizeof(void *);
+            offsets.UFunction.Func += sizeof(void *);
         }
 
         return &offsets;
