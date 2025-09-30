@@ -273,6 +273,7 @@ bool IGameProfile::findProcessEvent(uint8_t *uObject, uintptr_t *pe_address_out,
 
     auto offs = GetOffsets();
     auto objArrayPtr = GetUEVars()->GetGUObjectsArrayPtr();
+    auto objObjectsPtr = GetUEVars()->GetObjObjectsPtr();
     int bestScore = 0;
     int bestScoreIdx = -1;
 
@@ -297,7 +298,7 @@ bool IGameProfile::findProcessEvent(uint8_t *uObject, uintptr_t *pe_address_out,
             if (!insn.isValid())
                 continue;
 
-            if (insn.type == EKittyInsnTypeArm64::ADRP || insn.type == EKittyInsnTypeArm64::ADR)
+            if (!oks[0] && (insn.type == EKittyInsnTypeArm64::ADRP || insn.type == EKittyInsnTypeArm64::ADR))
             {
                 uintptr_t adrp_adr = insn.target;
                 for (size_t k = 1; k < 8 && k < instrs.size(); k++)
@@ -311,7 +312,7 @@ bool IGameProfile::findProcessEvent(uint8_t *uObject, uintptr_t *pe_address_out,
                 }
 
                 uintptr_t adrp_adr_deref = vm_rpm_ptr<uintptr_t>((void *)adrp_adr);
-                if (adrp_adr == objArrayPtr || adrp_adr_deref == objArrayPtr)
+                if (adrp_adr == objArrayPtr || adrp_adr_deref == objArrayPtr || adrp_adr == objObjectsPtr || adrp_adr_deref == objObjectsPtr )
                     oks[0] = true;
             }
 
