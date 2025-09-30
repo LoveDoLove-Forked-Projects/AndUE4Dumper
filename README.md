@@ -13,7 +13,7 @@ project.
 * Generate function names json script to use with IDA & Ghidra etc
 * Symbol and pattern scanning to find GUObjectArray, GNames and NamePoolData addresses automatically
 * Find GEngine and GWorld in Data segment
-* Find ProcessEvent index & offset (64bit only for now)
+* Find ProcessEvent index and offset (64bit only for now)
 * Dump UE library from memory
 
 ## Currently Supported Games
